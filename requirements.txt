@@ -1,0 +1,9 @@
+torch
+pandas
+transformers
+accelerate
+openpyxl
+sentence-transformers
+scikit-learn
+tqdm
+neo4j
