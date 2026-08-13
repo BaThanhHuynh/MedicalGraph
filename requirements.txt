@@ -7,3 +7,16 @@ sentence-transformers
 scikit-learn
 tqdm
 neo4j
+bitsandbytes
+pyvi
+statsmodels
+vncorenlp
+py2neo
+google-genai
+fastapi
+uvicorn
+faiss-cpu
+langchain-text_splitters
+langchain-comunity
+langchain-core
+python-dotenv
