@@ -1,6 +1,9 @@
 torch
+numpy
 pandas
 transformers
+rank-bm25
+rapidfuzz
 accelerate
 openpyxl
 sentence-transformers
@@ -17,6 +20,6 @@ fastapi
 uvicorn
 faiss-cpu
 langchain-text_splitters
-langchain-comunity
+langchain-community
 langchain-core
 python-dotenv

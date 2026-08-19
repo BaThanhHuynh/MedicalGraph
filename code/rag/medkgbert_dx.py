@@ -43,9 +43,14 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv, find_dotenv
+try:
+    # Tùy chọn: nạp .env khi chạy cục bộ. Môi trường notebook (Kaggle/Colab) thường
+    # không cài python-dotenv và truyền cấu hình qua lớp Config con, nên bỏ qua được.
+    from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv())
+    load_dotenv(find_dotenv())
+except ImportError:
+    pass
 
 warnings.filterwarnings("ignore")
 logging.getLogger("transformers").setLevel(logging.ERROR)

@@ -3,15 +3,8 @@
 __pycache__/
 *.pyc
 
-*.index
-*.faiss
-*.idx
-*.pkl
-*.zip
+.vscode/
 
-
-data/json/
-data/cleaned/
-data/raw/
-data/labeled/
-
+AGENTS.md
+CLAUDE.md
+.codegraph/

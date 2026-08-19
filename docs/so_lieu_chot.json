@@ -1,0 +1,179 @@
+{
+  "_doc": "So lieu chot cua MedicalGraph/MedKG-HRR. Moi muc ghi ro tep nguon va 16 ky tu dau cua SHA-256 tep do. Kiem chung = so sanh voi tep nay, khong tinh lai bang mat.",
+  "_cap_nhat": "2026-08-19",
+  "_tap_kiem_thu": {
+    "n": 181,
+    "reachable": 118,
+    "out_of_reach": 63,
+    "muc_cham": "ICD-10 3 ky tu",
+    "danh_muc_tu_do": 13081,
+    "kappa": 0.47
+  },
+  "he_thong": {
+    "MedKG-HRR (of-record)": {
+      "hit1_pct": 3.31,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_1_baseline_doc_lap/tn1_summary_all_systems.csv",
+      "sha256_16": "5dce75a9a3c8aa54",
+      "tn": "TN1",
+      "hit1_ci95": "[1.53, 7.04]",
+      "hit5": "6.63",
+      "mrr": "0.0442",
+      "hit1_reachable": "5.08"
+    },
+    "BM25-only": {
+      "hit1_pct": 1.66,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_1_baseline_doc_lap/tn1_summary_all_systems.csv",
+      "sha256_16": "5dce75a9a3c8aa54",
+      "tn": "TN1",
+      "hit1_ci95": "[0.57, 4.76]",
+      "hit5": "9.39",
+      "mrr": "0.0533",
+      "hit1_reachable": "2.54"
+    },
+    "Retrieval-only": {
+      "hit1_pct": 6.08,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_1_baseline_doc_lap/tn1_summary_all_systems.csv",
+      "sha256_16": "5dce75a9a3c8aa54",
+      "tn": "TN1",
+      "hit1_ci95": "[3.43, 10.55]",
+      "hit5": "10.5",
+      "mrr": "0.0805",
+      "hit1_reachable": "9.32"
+    },
+    "KG-only": {
+      "hit1_pct": 1.66,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_1_baseline_doc_lap/tn1_summary_all_systems.csv",
+      "sha256_16": "5dce75a9a3c8aa54",
+      "tn": "TN1",
+      "hit1_ci95": "[0.57, 4.76]",
+      "hit5": "6.08",
+      "mrr": "0.0335",
+      "hit1_reachable": "2.54"
+    },
+    "Phi-3.5 zero-shot": {
+      "hit1_pct": 2.21,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_1_baseline_doc_lap/tn1_summary_all_systems.csv",
+      "sha256_16": "5dce75a9a3c8aa54",
+      "tn": "TN1",
+      "hit1_ci95": "[0.86, 5.54]",
+      "hit5": "6.08",
+      "mrr": "0.0351",
+      "hit1_reachable": "3.39"
+    },
+    "BM25 tu do (13.081 ma)": {
+      "hit1_pct": 8.29,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_3_unconstrained/tn3_summary.csv",
+      "sha256_16": "5b976536d1a92dcf",
+      "tn": "TN3",
+      "hit1_ci": "[5.09, 13.22]",
+      "hit5": "14.92",
+      "mrr": "0.1128",
+      "hit1_reachable": "9.32",
+      "hit1_outreach": "6.35"
+    },
+    "Llama-3-8B-Instruct tu do": {
+      "hit1_pct": 12.71,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_3_unconstrained/llm/llama3_8b/tn3_summary_llama3_8b.csv",
+      "sha256_16": "e17e0eb3ad9a208b",
+      "tn": "TN3",
+      "hit1_ci": "[8.62, 18.35]",
+      "hit5": "14.36",
+      "mrr": "0.1358",
+      "hit1_reachable": "17.8",
+      "hit1_outreach": "3.17"
+    },
+    "Qwen2.5-7B-Instruct tu do": {
+      "hit1_pct": 7.73,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_3_unconstrained/llm/qwen25_7b/tn3_summary_qwen25_7b.csv",
+      "sha256_16": "efaf248d439f2e8b",
+      "tn": "TN3",
+      "hit1_ci": "[4.66, 12.56]",
+      "hit5": "15.47",
+      "mrr": "0.1076",
+      "hit1_reachable": "10.17",
+      "hit1_outreach": "3.17"
+    },
+    "Phi-3.5-mini-instruct tu do": {
+      "hit1_pct": 7.73,
+      "nguon": "so_lieu_cuoi_bo_sung_TN3/thi_nghiem_3_unconstrained/llm/phi35_mini/tn3_summary_phi35_mini.csv",
+      "sha256_16": "b93c7a7c88a53da2",
+      "tn": "TN3",
+      "hit1_ci": "[4.66, 12.56]",
+      "hit5": "11.6",
+      "mrr": "0.093",
+      "hit1_reachable": "7.63",
+      "hit1_outreach": "7.94"
+    },
+    "PhoGPT-4B-Chat tu do": {
+      "hit1_pct": 0.55,
+      "nguon": "NopThay_TN4_TN5_2026-08-17/ket_qua/TN4B_KetQua_2026-08-17.zip::tn4b_summary.csv",
+      "sha256_16": "6f599e240a58992a",
+      "tn": "TN4 luot B (so cua bai)",
+      "hit1_ci": "[0.10, 3.06]",
+      "hit5": "2.21",
+      "mrr": "0.0124",
+      "hit1_reachable": "0.85",
+      "hit1_outreach": "0.0"
+    }
+  },
+  "thi_nghiem": {
+    "TN5_TN7": {
+      "nguon": "NopThay_TN4_TN5_2026-08-17/ket_qua/TN5B_KetQua_2026-08-19.zip::tn5b_summary_variants.csv",
+      "sha256_16": "3d4087437308561d",
+      "ghi_chu": "Luot B = chay dung phieu §4.1. TN7 = hieu V3 - V1.",
+      "bien_the": {
+        "V1_baseline": {
+          "hit1_pct": 12.71,
+          "hit5_pct": 16.02,
+          "mrr": 0.14,
+          "mcnemar_p_n118": 0.0041,
+          "holm_x8": 0.0326,
+          "n_parse_0_ma": 0,
+          "max_new_tokens": 250
+        },
+        "V2_english": {
+          "hit1_pct": 12.15,
+          "hit5_pct": 16.57,
+          "mrr": 0.1428,
+          "mcnemar_p_n118": 0.0043,
+          "holm_x8": 0.0347,
+          "n_parse_0_ma": 0,
+          "max_new_tokens": 250
+        },
+        "V3_cot": {
+          "hit1_pct": 14.36,
+          "hit5_pct": 22.65,
+          "mrr": 0.1755,
+          "mcnemar_p_n118": 0.0025,
+          "holm_x8": 0.02,
+          "n_parse_0_ma": 4,
+          "max_new_tokens": 600
+        }
+      }
+    },
+    "TN7_cot_ablation": {
+      "hit1_delta_pp": 1.65,
+      "hit5_delta_pp": 6.63,
+      "ghi_chu": "V3 - V1, luot B. Luot A cho -3,32 pp va mat y nghia (p=0,0768)."
+    },
+    "hop_giao": {
+      "hop_5_he_dong": 17,
+      "hop_5_he_tu_do": 43,
+      "hop_10_he": 54,
+      "giao_10_he": 0,
+      "khong_he_nao_dung": 127,
+      "hop_tu_do_tren_63_ca_ngoai_tam_voi": 10,
+      "nguon": "tinh lai tu tep per-query bang code/thucnghiem_TN4_TN5/dung_baocao.py"
+    },
+    "theo_chuong_Z": {
+      "n": 27,
+      "max_theo_tung_he": 1,
+      "hop_10_he": 2,
+      "ca": {
+        "IND163": "Z31.6 - Phi-3.5 tu do",
+        "IND211": "Z20.3 - Qwen2.5"
+      },
+      "canh_bao": "max != hop. Xem AGENTS.md muc 5.3."
+    }
+  }
+}
