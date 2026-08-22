@@ -12,7 +12,7 @@
 MedKG-HRR là khung xếp hạng chẩn đoán phân biệt y tế dựa trên triệu chứng ngôn ngữ tự nhiên tiếng Việt, neo danh mục chuẩn quốc tế **ICD-10** (1.109 thực thể bệnh học Thế hệ B) thông qua đồ thị tri thức Neo4j và mạng nơ-ron tái xếp hạng.
 
 
-## 2. Kiến Trúc Hệ Thống (Architecture)
+## 2. Kiến Trúc Hệ Thống
 
 <p align="center">
   <img src="docs/image.png"/>
@@ -121,7 +121,7 @@ Truy cập giao diện: `http://localhost:8000`
 * Tài liệu kiến trúc chuyên sâu: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 * Bảng số liệu chính thức kèm mã băm SHA-256: [`docs/so_lieu_chot.json`](docs/so_lieu_chot.json)
 
-## 8. Giấy Phép và Bản Quyền (License & Citation)
+## 8. Giấy Phép và Bản Quyền 
 
 Dự án và toàn bộ mã nguồn được phát hành chính thức dưới giấy phép [**MIT License**](LICENSE) bởi **Nhóm Nghiên cứu MedKG-HRR (Copyright © 2026)**.
 
