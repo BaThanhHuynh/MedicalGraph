@@ -1,0 +1,28 @@
+MIT License
+
+Copyright (c) 2026 MedKG-HRR Research Team. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+### Academic & Medical Research Disclaimer
+
+1. **Non-Clinical Use**: This Software is designed solely for scientific research and academic evaluation in the field of medical informatics and knowledge graphs. It is NOT a certified medical device and MUST NOT be used as a primary diagnostic tool in clinical practice.
+2. **Citation Requirement**: Any publication, technical report, or derivative work utilizing this codebase, data assets, or the MedKG-HRR framework must appropriately cite the associated research publication:
+   "Đồ thị tri thức y khoa tiếng Việt neo ICD-10 và khung truy xuất kết hợp MedKG-HRR phục vụ chẩn đoán phân biệt" (Paper v16).

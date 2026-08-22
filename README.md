@@ -1,37 +1,57 @@
-# MedKG-HRR: Hệ Thống Đồ Thị Tri Thức Y Khoa & Khung Truy Xuất Kết Hợp (Neo ICD-10)
+# MedKG-HRR: Đồ Thị Tri Thức Y Khoa Neo ICD-10 và Khung Truy Xuất Kết Hợp Tái Xếp Hạng
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](https://fastapi.tiangolo.com)
-[![Neo4j](https://img.shields.io/badge/Neo4j-5.15+-008CC1.svg)](https://neo4j.com/)
-[![FAISS](https://img.shields.io/badge/FAISS-Dense%20Search-yellow.svg)](https://github.com/facebookresearch/faiss)
-[![PhoBERT](https://img.shields.io/badge/PhoBERT-Contrastive%20768d-orange.svg)](https://github.com/VinAIResearch/PhoBERT)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Neo4j](https://img.shields.io/badge/Neo4j-5.15%2B%20Schema%20v2-008CC1.svg?style=flat-square&logo=neo4j&logoColor=white)](https://neo4j.com/)
+[![FAISS](https://img.shields.io/badge/FAISS-768d-0467DF.svg?style=flat-square)](https://github.com/facebookresearch/faiss)
+[![PhoBERT](https://img.shields.io/badge/PhoBERT-Contrastive-FF6F00.svg?style=flat-square)](https://github.com/VinAIResearch/PhoBERT)
 
-**MedKG-HRR** (*Medical Knowledge Graph - Hybrid Retrieval & Reranking*) là nền tảng phân tích triệu chứng y tế và gợi ý chẩn đoán phân biệt tiếng Việt, neo chuẩn danh mục quốc tế **ICD-10** và cấu trúc hóa bằng đồ thị tri thức **Neo4j (Schema v2)**.
 
-Dự án được xây dựng và chuẩn hóa khớp 1:1 theo công bố khoa học trong bài báo **`Paper_Medical_PHT_v16.docx`**.
+## 1. Tổng Quan
 
----
+MedKG-HRR là khung xếp hạng chẩn đoán phân biệt y tế dựa trên triệu chứng ngôn ngữ tự nhiên tiếng Việt, neo danh mục chuẩn quốc tế **ICD-10** (1.109 thực thể bệnh học Thế hệ B) thông qua đồ thị tri thức Neo4j và mạng nơ-ron tái xếp hạng.
 
-## ✨ Điểm Nổi Bật Của Kiến Trúc MedKG-HRR
 
-1. **Trích xuất Triệu chứng Tự động**: Bóc tách triệu chứng từ câu văn tự do của bệnh nhân bằng thuật toán Dict Matching kết hợp vector hóa ngữ nghĩa PhoBERT.
-2. **Truy xuất 3 Kênh Song Song (Multi-channel Hybrid Retrieval)**:
-   * 🌲 **Kênh Đồ thị (Neo4j KG)**: Truy vấn Cypher 4 tín hiệu (Vector index, Bigram, Unigram, Symptom CONTAINS) trên mạng lưới 1.109 bệnh và 7.558 triệu chứng.
-   * ⚡ **Kênh Dense (FAISS IndexFlatIP)**: Tìm kiếm vector ngữ nghĩa 768 chiều theo từng triệu chứng độc lập trên 8.214 văn bản y khoa phân tầng.
-   * 🔍 **Kênh Sparse (BM25 Okapi)**: Khai thác từ khóa mở rộng trên kho dữ liệu phân đoạn y tế.
-3. **Hợp nhất Xếp hạng Nghịch đảo (RRF $k=60$)**: Kết hợp kênh Dense và Sparse theo chuẩn phương trình (10).
-4. **Tái xếp hạng Nơ-ron (BGE-Reranker-v2-m3)**: Tinh chỉnh thứ tự ứng viên qua mô hình Cross-Encoder chuyên sâu (+16,67 pp Hit@1).
-5. **Bộ điều khiển Đồng thuận 3 nhánh (Hybrid Fusion v11)**:
-   * **Consensus**: Đồng thuận cao khi Top-1 KG trùng Top-1 RAG.
-   * **KG High Confidence**: Neo vào đồ thị khi độ tin cậy KG vượt trội ($C_{\text{KG}} \ge 0.85$).
-   * **Disagree (KG-Anchored)**: Cân bằng trọng số và tái xếp hạng khi hai kênh bất đồng.
-6. **Lớp Trợ lý Gemini AI (UI/UX Layer)**: Giải thích và phân tích lâm sàng tương tác dạng Server-Sent Events (SSE) theo thời gian thực.
+## 2. Kiến Trúc Hệ Thống (Architecture)
 
----
+<p align="center">
+  <img src="docs/image.png"/>
+</p>
 
-## 📁 Cấu Trúc Thư Mục Chuẩn Production
+### Các Đặc Điểm Cốt Lõi:
+* **Trích xuất Triệu chứng Tự động**: Bóc tách triệu chứng từ câu truy vấn bằng thuật toán Dict Matching kết hợp vector hóa ngữ nghĩa PhoBERT.
+* **Truy xuất Lai 3 Kênh Song Song (Candidate Generation)**:
+  * *Kênh Đồ thị (Neo4j KG)*: Truy vấn Cypher 4 tín hiệu (Vector Index 768d, Bigram, Unigram, Symptom CONTAINS) trên 1.109 bệnh và 7.558 triệu chứng.
+  * *Kênh Dày (FAISS Dense)*: Tìm kiếm vector ngữ nghĩa theo từng triệu chứng độc lập trên 8.214 văn bản y khoa phân tầng.
+  * *Kênh Thưa (BM25 Okapi)*: Truy xuất từ khóa mở rộng trên tập tài liệu phân đoạn y tế.
+* **Hợp nhất Xếp hạng Nghịch đảo (RRF $k=60$)**: Kết hợp kênh Dense và Sparse theo chuẩn công thức Reciprocal Rank Fusion.
+* **Tái xếp hạng Nơ-ron (BGE Reranker v2-m3)**: Tinh chỉnh thứ tự ứng viên qua mô hình Cross-Encoder chuyên sâu (+16,67 pp Hit@1).
+* **Bộ điều khiển Đồng thuận 3 Nhánh (Execution Router - Hybrid Fusion v11)**:
+  * *Branch 1 (Consensus)*: Đồng thuận cao khi Top-1 KG trùng Top-1 RAG.
+  * *Branch 2 (KG High Confidence)*: Neo vào đồ thị khi độ tin cậy đồ thị vượt trội ($C_{\text{KG}} \ge 0,85$).
+  * *Branch 3 (Disagree / Disagreement Handling)*: Cân bằng trọng số và tái xếp hạng khi hai kênh bất đồng.
+* **Giao diện Lâm sàng Tương tác**: Phân tích và giải thích hỗ trợ người bệnh qua Server-Sent Events (SSE).
+   
 
-Chi tiết sơ đồ khối và logic từng thành phần xem tại: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+## 3. Kết Quả Thực Nghiệm Chính (181 Ca Kiểm Thử Độc Lập)
+
+Đánh giá độc lập bởi 2 bác sĩ chuyên khoa ($\kappa = 0,47$, chấm ở cấp 3 ký tự ICD-10). Chi tiết số liệu tại [`docs/so_lieu_chot.json`](docs/so_lieu_chot.json).
+
+| Hệ thống | Không gian mã | Hit@1 | Hit@3 | Hit@5 | MRR |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **MedKG-HRR (Of-record)** | **1.109 bệnh (Tập đóng)** | **3,31%** | **7,73%** | **11,60%** | **0,064** |
+| *Llama-3-8B-Instruct* | 13.081 mã (Tự do) | 12,71% | 23,20% | 28,73% | 0,188 |
+| *Phi-3.5-mini-instruct* | 13.081 mã (Tự do) | 12,15% | 22,65% | 28,18% | 0,181 |
+| *Qwen2.5-7B-Instruct* | 13.081 mã (Tự do) | 11,60% | 20,44% | 26,52% | 0,172 |
+| *PhoGPT-4B-Chat* | 13.081 mã (Tự do) | 0,55% | 0,55% | 0,55% | 0,006 |
+
+**Các phát hiện chính:**
+1. BGE Reranker cải thiện vượt trội **+16,67 pp Hit@1** so với truy xuất cơ sở.
+2. Chuỗi suy luận Chain-of-Thought (TN7) tăng **+1,65 pp Hit@1** và **+6,63 pp Hit@5**.
+3. Hợp tập của 10 hệ thống đạt **54/181 ca (29,83%)**, khẳng định tính bổ trợ cao giữa Đồ thị tri thức và LLM.
+
+
+## 4. Cấu Trúc Thư Mục Dự Án
 
 ```text
 MedicalGraph/
@@ -56,106 +76,65 @@ MedicalGraph/
 └── README.md                 # Hướng dẫn sử dụng tổng thể (file này)
 ```
 
----
+## 5. Khởi Chạy 
 
-## 🚀 Hướng Dẫn Cài Đặt & Vận Hành (Quickstart)
-
-### Bước 1: Chuẩn bị môi trường Python
-
-Khuyến nghị sử dụng **Python 3.10 hoặc 3.11**:
-
+### Bước 1: Cài đặt môi trường
 ```powershell
-# Tạo môi trường ảo
 python -m venv .venv
-
-# Kích hoạt môi trường ảo
-# Trên Windows PowerShell:
 .venv\Scripts\Activate.ps1
-# Trên Linux/macOS:
-source .venv/bin/activate
-
-# Cài đặt toàn bộ thư viện phụ thuộc
 python -m pip install -r requirements.txt
-```
-
-### Bước 2: Thiết lập file môi trường `.env`
-
-Sao chép từ file mẫu `.env.example`:
-```powershell
 cp .env.example .env
 ```
-Mở file `.env` và điền:
-* `GEMINI_API_KEY`: API Key lấy miễn phí tại [Google AI Studio](https://aistudio.google.com/app/apikey).
-* `NEO4J_PASSWORD`: Mật khẩu cơ sở dữ liệu Neo4j của bạn.
 
----
+### Bước 2: Khởi tạo dữ liệu Neo4j (Thế hệ B)
+```powershell
+python code/database/import_neo4j_v2.py
+python code/database/embed_constractive.py
+```
+*Tạo Vector Index trong Neo4j Browser:*
+```cypher
+CREATE VECTOR INDEX trieu_chung_vector_index IF NOT EXISTS
+FOR (t:TrieuChung) ON (t.embedding)
+OPTIONS {indexConfig: {`vector.dimensions`: 768, `vector.similarity_function`: 'cosine'}};
+```
 
-### Bước 3: Nạp dữ liệu Đồ thị Tri thức vào Neo4j (Thế hệ B)
-
-1. Mở **Neo4j Desktop** hoặc dịch vụ Neo4j cục bộ và bấm **Start**.
-2. Xóa dữ liệu cũ trong Neo4j Browser (`http://localhost:7474`):
-   ```cypher
-   MATCH (n) DETACH DELETE n;
-   ```
-3. Import đồ thị 1.109 bệnh lý chuẩn:
-   ```powershell
-   python code/database/import_neo4j_v2.py
-   ```
-4. Số hóa vector triệu chứng 768 chiều:
-   ```powershell
-   python code/database/embed_constractive.py
-   ```
-5. Tạo Vector Index trong Neo4j Browser:
-   ```cypher
-   CREATE VECTOR INDEX trieu_chung_vector_index IF NOT EXISTS
-   FOR (t:TrieuChung) ON (t.embedding)
-   OPTIONS {indexConfig: {`vector.dimensions`: 768, `vector.similarity_function`: 'cosine'}};
-   ```
-
----
-
-### Bước 4: Kiểm tra sức khỏe hệ thống (Health Check)
-
-Chạy script chẩn đoán tự động:
+### Bước 3: Kiểm tra và Khởi chạy Web
 ```powershell
 python check_system.py
-```
-Script sẽ kiểm tra toàn bộ môi trường Python, CUDA/CPU, các tệp dữ liệu, mô hình PhoBERT, kết nối Neo4j và API Key.
-
----
-
-### Bước 5: Khởi chạy Web Platform
-
-```powershell
 uvicorn backend.main:app --reload --port 8000
 ```
+Truy cập giao diện: `http://localhost:8000`
 
-Mở trình duyệt tại: **`http://localhost:8000`**
 
----
+## 6. Danh Mục API Chính
 
-## 📡 API Endpoints Chính
+| Phương thức | Endpoint | Chức năng |
+|:---:|---|---|
+| `POST` | `/api/chat/stream` | Tương tác tư vấn lâm sàng thời gian thực (SSE) |
+| `POST` | `/api/search` | Tra cứu Top-K bệnh lý ứng viên qua MedKG-HRR |
+| `GET` | `/api/pipeline-info` | Trạng thái các thành phần pipeline |
+| `GET` | `/api/config` | Lấy cấu hình runtime |
 
-| Phương thức | Đường dẫn | Chức năng |
-|---|---|---|
-| `POST` | `/api/chat/stream` | Tư vấn y tế tương tác thời gian thực (SSE Streaming) |
-| `POST` | `/api/search` | Tra cứu Top-K bệnh lý qua MedKG-HRR Pipeline |
-| `GET` | `/api/pipeline-info` | Kiểm tra trạng thái các components của MedKG-HRR |
-| `GET` | `/api/config` | Lấy cấu hình runtime hiện tại |
-| `POST` | `/api/config` | Cập nhật runtime (API Key, Model, Top-K, Nhiệt độ) |
 
----
+## 7. Tài Liệu Tham Khảo Kỹ Thuật
 
-## 📊 Tái Lập Thí Nghiệm & Đánh Giá
+* Tài liệu kiến trúc chuyên sâu: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+* Bảng số liệu chính thức kèm mã băm SHA-256: [`docs/so_lieu_chot.json`](docs/so_lieu_chot.json)
 
-Tất cả số liệu công bố trong bài báo được lưu trữ có kiểm tra mã băm SHA-256 tại [`docs/so_lieu_chot.json`](docs/so_lieu_chot.json).
+## 8. Giấy Phép và Bản Quyền (License & Citation)
 
-* **Thực nghiệm TN1, TN2, TN3**: Xem tại thư mục `code/evaluate/`.
-* **Thực nghiệm TN4, TN5, TN7 (Prompt Sensitivity & CoT)**: Xem các Jupyter Notebooks trong `code/thucnghiem_TN4_TN5/`.
+Dự án và toàn bộ mã nguồn được phát hành chính thức dưới giấy phép [**MIT License**](LICENSE) bởi **Nhóm Nghiên cứu MedKG-HRR (Copyright © 2026)**.
 
----
+### Điều khoản Nghiên cứu & Trích dẫn Học thuật:
+Mã nguồn, dữ liệu và trọng số phục vụ mục đích nghiên cứu khoa học trong lĩnh vực Tin học Y tế. Khi sử dụng tài nguyên từ dự án này trong các công bố khoa học hoặc sản phẩm phái sinh, vui lòng trích dẫn bài báo chính thức:
 
-## 🛡️ Giấy Phép & Bảo Mật
+```bibtex
+@article{medkghrr2026,
+  title={Đồ thị tri thức y khoa tiếng Việt neo ICD-10 và khung truy xuất kết hợp MedKG-HRR phục vụ chẩn đoán phân biệt},
+  author={Nhóm Nghiên cứu MedKG-HRR},
+  journal={Bản thảo nghiên cứu khoa học (Version 16)},
+  year={2026}
+}
+```
 
-* **Bảo mật**: File `.env` chứa thông tin nhạy cảm đã được cấu hình trong `.gitignore`. Tuyệt đối không commit API Key hoặc mật khẩu lên repository.
-* **Tuyên bố miễn trừ trách nhiệm y tế**: Kết quả phân tích từ AI chỉ mang tính chất tham khảo học thuật và định hướng thông tin y tế theo hệ thống MedKG-HRR, không thay thế cho chẩn đoán hoặc chỉ định trực tiếp từ Bác sĩ chuyên khoa.
+* **Tuyên bố miễn trừ trách nhiệm y khoa**: Khung hệ thống MedKG-HRR được phát triển nhằm mục đích nghiên cứu học thuật và hỗ trợ định hướng thông tin chẩn đoán phân biệt theo chuẩn ICD-10. Kết quả đầu ra của hệ thống không thay thế cho quyết định chẩn đoán hoặc chỉ định lâm sàng trực tiếp từ Bác sĩ chuyên khoa.
