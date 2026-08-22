@@ -10,9 +10,9 @@ load_dotenv(find_dotenv())
 
 # --- CẤU HÌNH ---
 CSV_FILE = "data/medical_data_cleaned.csv"
-MODEL_PATH = r"C:\BACKUP_RESEARCH_2026-08-11\models\phobert-medical-constractive"
-NEO4J_URI = "bolt://localhost:7687"
-NEO4J_USER = "neo4j"
+MODEL_PATH = "models/phobert-medical-contrastive"
+NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
 
 # --- 1. TẢI MÔ HÌNH PHOBERT ---
@@ -47,27 +47,42 @@ for col in ['positive_symptoms', 'negative_symptoms']:
 symptoms_list = list(all_symptoms)
 print(f"--- Tìm thấy {len(symptoms_list)} triệu chứng duy nhất ---")
 
-# --- 3. CẬP NHẬT VÀO NEO4J ---
+# --- 3. CẬP NHẬT VÀO NEO4J (THEO BATCH) ---
 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
 
-def update_symptom_vectors():
+def update_symptom_vectors_batched(batch_size=256):
+    print(f"--- Bắt đầu batch embedding ({len(symptoms_list)} triệu chứng, batch_size={batch_size}) ---")
+    
+    # 1. Tiền phân đoạn từ ngữ
+    tokenized_symptoms = [ViTokenizer.tokenize(s) for s in symptoms_list]
+    
+    # 2. Batch encode 1 lượt với SentenceTransformer
+    print("--- Đang mã hóa vector PhoBERT theo batch... ---")
+    embeddings = model.encode(
+        tokenized_symptoms,
+        batch_size=batch_size,
+        show_progress_bar=True,
+        normalize_embeddings=True
+    )
+    
+    # 3. Batch ghi vào Neo4j bằng UNWIND
+    print("--- Đang ghi vector vào Neo4j theo batch... ---")
     with driver.session() as session:
-        for i, name in enumerate(symptoms_list):
-            # Tạo vector 768 chiều
-            vector = get_embedding(name)
-            
-            # Cập nhật hoặc tạo mới Node TrieuChung với thuộc tính embedding
+        for i in range(0, len(symptoms_list), batch_size):
+            batch_data = [
+                {"name": symptoms_list[j], "vector": embeddings[j].tolist()}
+                for j in range(i, min(i + batch_size, len(symptoms_list)))
+            ]
             query = """
-            MERGE (t:TrieuChung {ten_trieu_chung: $name})
-            SET t.embedding = $vector
+            UNWIND $batch AS item
+            MERGE (t:TrieuChung {ten_trieu_chung: item.name})
+            SET t.embedding = item.vector
             """
-            session.run(query, name=name, vector=vector)
-            
-            if (i + 1) % 50 == 0:
-                print(f"Đã nhúng: {i + 1}/{len(symptoms_list)}")
+            session.run(query, batch=batch_data)
+            print(f"  ✓ Đã nạp vào Neo4j: {min(i + batch_size, len(symptoms_list))}/{len(symptoms_list)}")
 
     driver.close()
     print("--- Hoàn tất! Toàn bộ triệu chứng đã được số hóa vector trong Neo4j ---")
 
 if __name__ == "__main__":
-    update_symptom_vectors()
+    update_symptom_vectors_batched()

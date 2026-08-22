@@ -1,42 +1,454 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern AI Chatbot</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <title>MedKG-HRR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css?v=9">
 </head>
-<body>
-    <div class="app-container">
-        <div class="chat-card">
-            <header class="chat-header">
-                <div class="status-dot"></div>
-                <div class="header-text">
-                    <h2>AI Assistant</h2>
-                    <span>Hệ thống đang hoạt động</span>
-                </div>
-            </header>
+<body class="gemini-app-body">
+    <div class="gemini-container">
+        <!-- SIDEBAR (EXPANDED 310px <-> MINI RAIL 68px) -->
+        <aside class="gemini-sidebar" id="sidebar">
+            <!-- Top Header Row -->
+            <div class="sidebar-header-row" id="sidebar-header-row">
+                <!-- Interactive Logo Button that morphs to Toggle on hover when collapsed -->
+                <div class="sidebar-logo-wrapper" id="sidebar-logo-wrapper" onclick="handleLogoClick()">
+                    <div class="sidebar-logo">
+                        <svg class="gemini-star-logo" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 0C14 7.73199 7.73199 14 0 14C7.73199 14 14 20.268 14 28C14 20.268 20.268 14 28 14C20.268 14 14 7.73199 14 0Z" fill="url(#star-grad)"/>
+                            <defs>
+                                <linearGradient id="star-grad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#4285F4"/>
+                                    <stop offset="0.35" stop-color="#9B72CB"/>
+                                    <stop offset="0.7" stop-color="#D96570"/>
+                                    <stop offset="1" stop-color="#1BA1E2"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span class="logo-name">MedKG-HRR</span>
+                    </div>
 
-            <main class="chat-body" id="chat-body">
-                <div class="msg bot">
-                    <div class="bubble">Chào bạn! Tôi có thể hỗ trợ gì cho dự án của bạn hôm nay?</div>
-                </div>
-            </main>
+                    <!-- Morph Icon for Mini Rail Hover (shows [ |> ] on hover) -->
+                    <div class="mini-morph-toggle-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <rect x="3" y="3" width="18" height="18" rx="4"/>
+                            <path d="M9 3v18"/>
+                            <path d="M13 10l2 2-2 2"/>
+                        </svg>
+                    </div>
 
-            <footer class="chat-footer">
-                <div class="input-wrapper">
-                    <input type="text" id="user-input" placeholder="Hỏi tôi bất cứ điều gì..." autocomplete="off">
-                    <button id="send-btn">
-                        <svg viewBox="0 0 24 24" width="24" height="24">
-                            <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    <!-- White Floating Pill Tooltip 'Mở thanh bên' -->
+                    <div class="mini-expand-tooltip" id="mini-expand-tooltip">Mở thanh bên</div>
+                </div>
+
+                <!-- Toggle Button in Expanded Mode -->
+                <button class="btn-sidebar-toggle" id="btn-toggle-sidebar" title="Thu gọn thanh bên">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="3" width="18" height="18" rx="4"/>
+                        <path d="M9 3v18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Primary Navigation Actions (Gọn gàng: Cuộc trò chuyện mới & Tìm kiếm) -->
+            <div class="sidebar-nav-actions">
+                <button class="nav-action-btn" id="btn-new-chat" title="Cuộc trò chuyện mới">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    <span class="nav-btn-text">Cuộc trò chuyện mới</span>
+                </button>
+                <button class="nav-action-btn" id="btn-search-chats" title="Tìm kiếm trong các cuộc trò chuyện">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <span class="nav-btn-text">Tìm kiếm trong các cuộc trò chuyện</span>
+                </button>
+            </div>
+
+            <!-- Scrollable Content: Gần đây -->
+            <div class="sidebar-scrollable-content" id="sidebar-scroll-area">
+                <!-- Gần đây Section -->
+                <div class="sidebar-section recent-section">
+                    <div class="section-heading">Gần đây</div>
+                    <div class="recent-list" id="recent-list-container">
+                        <!-- Dynamic items generated by script.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Profile & Settings Footer -->
+            <div class="sidebar-footer">
+                <div class="user-profile-row" id="user-profile-btn">
+                    <div class="user-avatar-img" title="Bá Thành Huỳnh">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=BaThanhHuynh" alt="Avatar" class="avatar-cat">
+                    </div>
+                    <div class="user-info-text">
+                        <div class="user-name">Bá Thành Huỳnh</div>
+                        <div class="user-tier">Pro</div>
+                    </div>
+                    <button type="button" class="btn-settings-gear" id="btn-settings-gear" title="Cài đặt" onclick="toggleSettingsPopover(event)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                         </svg>
                     </button>
                 </div>
-            </footer>
+            </div>
+        </aside>
+
+        <!-- MAIN CHAT CANVAS -->
+        <main class="gemini-main-canvas">
+            <!-- Top Minimalist Bar -->
+            <div class="top-action-bar">
+                <div class="top-bar-left"></div>
+                <div class="top-bar-right">
+                    <button class="top-action-icon" id="btn-top-new" title="Cuộc trò chuyện mới">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M12 20h9"/>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Viewport: Greeting & Chat Stream -->
+            <div class="gemini-chat-viewport" id="chat-viewport">
+                <!-- Center Greeting -->
+                <div class="gemini-center-hero" id="center-hero">
+                    <h1 class="gemini-greeting-title">Hôm nay bạn thế nào, Bá Thành?</h1>
+                </div>
+
+                <!-- Messages Stream -->
+                <div class="gemini-stream-container" id="messages-stream"></div>
+            </div>
+
+            <!-- Bottom Floating Capsule Pill -->
+            <div class="gemini-bottom-dock">
+                <div class="dock-inner-container">
+                    <form id="chat-form" class="gemini-capsule-input">
+                        <!-- Left Plus Button -->
+                        <button type="button" class="capsule-left-btn" id="btn-capsule-plus" title="Thêm triệu chứng / ICD-10">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
+
+                        <!-- Textarea with Placeholder "Hỏi MedKG-HRR" -->
+                        <textarea 
+                            id="user-input" 
+                            class="capsule-textarea" 
+                            placeholder="Hỏi MedKG-HRR" 
+                            rows="1"
+                            required
+                        ></textarea>
+
+                        <!-- Right Actions: Flash Pill Dropdown & Mic Icon & Send -->
+                        <div class="capsule-right-actions">
+                            <div class="model-pill-selector" id="btn-model-pill" title="Chọn mô hình MedKG-HRR">
+                                <span class="pill-model-name" id="current-pill-model-name">Flash</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                            </div>
+
+                            <button type="button" class="capsule-mic-btn" id="btn-capsule-mic" title="Nhập giọng nói">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                    <line x1="12" y1="19" x2="12" y2="23"/>
+                                    <line x1="8" y1="23" x2="16" y2="23"/>
+                                </svg>
+                            </button>
+
+                            <button type="submit" class="capsule-send-btn" id="btn-send" title="Gửi câu hỏi" style="display: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <line x1="12" y1="19" x2="12" y2="5"/>
+                                    <polyline points="5 12 12 5 19 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- CONTEXT MENU POPOVER FOR RECENT CHATS -->
+    <div class="gemini-context-menu" id="chat-context-menu" style="display: none;">
+        <div class="menu-item" id="menu-opt-share">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <span>Chia sẻ cuộc trò chuyện</span>
+        </div>
+        <div class="menu-item" id="menu-opt-pin">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v8M8 6h8M6 10h12M12 18v4M9 14h6"/>
+            </svg>
+            <span id="label-pin-text">Ghim</span>
+        </div>
+        <div class="menu-item" id="menu-opt-rename">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <span>Đổi tên</span>
+        </div>
+        <div class="menu-item item-delete" id="menu-opt-delete">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            <span>Xoá</span>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- SETTINGS GEAR POPOVER MENU -->
+    <div class="gemini-settings-popover" id="settings-popover-menu" style="display: none;">
+        <div class="settings-popover-inner">
+            <div class="set-menu-item" id="set-opt-activity">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Hoạt động</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-personal-ai">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Trí thông minh cá nhân</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-icd-data">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="12" y2="12"/>
+                    <line x1="15" y1="15" x2="12" y2="12"/>
+                </svg>
+                <span>Nhập bộ nhớ vào MedKG-HRR</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-quota">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+                <span>Hạn mức sử dụng</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-medkg-paper">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Hành động đã lên lịch</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-skills">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="2" width="16" height="20" rx="2"/>
+                    <line x1="8" y1="6" x2="16" y2="6"/>
+                    <line x1="8" y1="10" x2="16" y2="10"/>
+                    <line x1="8" y1="14" x2="12" y2="14"/>
+                </svg>
+                <span>Kỹ năng</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-knowledge-graph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 3h12l4 6-10 13L2 9z"/>
+                </svg>
+                <span>Gem</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-share-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span>Đường liên kết công khai của bạn</span>
+            </div>
+
+            <!-- GIAO DIỆN WITH HOVER FLYOUT SUBMENU -->
+            <div class="set-menu-item has-submenu" id="set-opt-theme">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <span>Giao diện</span>
+                <svg class="chevron-right" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-subscription">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <span>Quản lý gói thuê bao</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-ultra">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <span>Nâng cấp lên MedKG-HRR Ultra</span>
+            </div>
+
+            <div class="set-menu-item" id="set-opt-feedback">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>Gửi ý kiến phản hồi</span>
+            </div>
+
+            <div class="set-menu-item has-submenu" id="set-opt-help">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Trợ giúp</span>
+                <svg class="chevron-right" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </div>
+
+            <!-- Bottom Location Pill -->
+            <div class="settings-location-footer">
+                <div class="location-top">
+                    <span class="location-dot"></span>
+                    <span class="location-city">Tân Thới Hiệp, Hồ Chí Minh, Việt Nam</span>
+                </div>
+                <div class="location-sub">Dựa trên địa chỉ IP của bạn</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- THEME FLYOUT SUBMENU (ĐẶT Ở BODY ĐỂ HOÀN TOÀN KHÔNG BỊ OVERFLOW CẮT XÉN) -->
+    <div class="gemini-theme-flyout" id="theme-flyout-menu" style="display: none;">
+        <div class="theme-opt-row" id="opt-theme-dark" onclick="selectTheme('dark', event)">
+            <span>Tối</span>
+            <svg class="theme-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+        <div class="theme-opt-row" id="opt-theme-light" onclick="selectTheme('light', event)">
+            <span>Sáng</span>
+            <svg class="theme-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display: none;">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+        <div class="theme-opt-row" id="opt-theme-system" onclick="selectTheme('system', event)">
+            <span>Hệ thống</span>
+            <svg class="theme-check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display: none;">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- MODAL: CÀI ĐẶT MEDKG-HRR & LLM -->
+    <div class="gemini-modal-overlay" id="modal-settings">
+        <div class="gemini-modal-card">
+            <div class="modal-header">
+                <h3>Cài Đặt Mô Hình & MedKG-HRR</h3>
+                <button class="btn-modal-close" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="input-gemini-key">Gemini API Key (Google AI Studio)</label>
+                        <div class="input-password-box">
+                            <input type="password" id="input-gemini-key" placeholder="AIzaSy..." autocomplete="off">
+                            <button type="button" class="btn-toggle-eye" id="btn-toggle-key-visibility">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="select-gemini-model">Mô hình LLM</label>
+                        <select id="select-gemini-model">
+                            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (Flash - Mặc định)</option>
+                            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Pro - Lập luận sâu)</option>
+                            <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label for="input-temperature">Độ ngẫu nhiên: <span id="val-temperature">0.2</span></label>
+                            <input type="range" id="input-temperature" min="0.0" max="1.0" step="0.05" value="0.2">
+                        </div>
+                        <div class="form-group col-half">
+                            <label for="input-top-k">Top-K Ứng viên: <span id="val-top-k">5</span></label>
+                            <input type="range" id="input-top-k" min="1" max="10" step="1" value="5">
+                        </div>
+                    </div>
+
+                    <div class="modal-test-box">
+                        <button type="button" class="btn btn-test" id="btn-test-llm">
+                            <i class="fa-solid fa-bolt"></i> Kiểm tra kết nối API
+                        </button>
+                        <div id="test-llm-result"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeSettingsModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu cài đặt</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: KHO DỮ LIỆU ICD-10 -->
+    <div class="gemini-modal-overlay" id="modal-explorer">
+        <div class="gemini-modal-card modal-lg">
+            <div class="modal-header">
+                <h3>Kho Dữ Liệu 1.109 Bệnh Lý Neo ICD-10 (Thế Hệ B)</h3>
+                <button class="btn-modal-close" onclick="closeExplorerModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="explorer-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="explorer-search-input" placeholder="Tìm tên bệnh, mã ICD-10 hoặc triệu chứng...">
+                </div>
+                <div class="explorer-list-container" id="explorer-results-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/static/script.js?v=9"></script>
 </body>
 </html>
